@@ -22,16 +22,23 @@ def download_audio(url: str) -> tuple[str, str]:
     """Download audio from YouTube."""
     print(f"  [1/3] Downloading: {url[:50]}...")
 
-    output_path = DATA_DIR / "audio" / "%(id)s.%(ext)s"
-    DATA_DIR.joinpath("audio").mkdir(parents=True, exist_ok=True)
+    audio_dir = DATA_DIR / "audio"
+    audio_dir.mkdir(parents=True, exist_ok=True)
+    output_path = audio_dir / "%(id)s.%(ext)s"
 
+    # First get title
+    title_result = subprocess.run(
+        ["yt-dlp", "--print", "title", "--no-playlist", url],
+        capture_output=True, text=True
+    )
+    title = title_result.stdout.strip() or "Unknown"
+
+    # Download audio
     cmd = [
         "yt-dlp", "-x",
         "--audio-format", "mp3",
         "--audio-quality", "5",
         "-o", str(output_path),
-        "--print", "filename",
-        "--print", "title",
         "--no-playlist",
         url
     ]
@@ -41,10 +48,12 @@ def download_audio(url: str) -> tuple[str, str]:
     if result.returncode != 0:
         raise Exception(f"yt-dlp failed: {result.stderr}")
 
-    lines = result.stdout.strip().split('\n')
-    audio_file = lines[-2].rsplit('.', 1)[0] + '.mp3'
-    title = lines[-1] if len(lines) >= 2 else "Unknown"
+    # Find the downloaded mp3 file (most recently modified)
+    mp3_files = sorted(audio_dir.glob("*.mp3"), key=lambda f: f.stat().st_mtime, reverse=True)
+    if not mp3_files:
+        raise Exception(f"No mp3 file found in {audio_dir}")
 
+    audio_file = str(mp3_files[0])
     print(f"  ✓ Downloaded: {title[:40]}")
     return audio_file, title
 
