@@ -1,0 +1,72 @@
+﻿# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+.venv/
+ENV/
+env/
+.eggs/
+*.egg-info/
+*.egg
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment & Secrets
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+secrets/
+
+# SQLite databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Audio/Video files (downloaded content)
+*.mp3
+*.mp4
+*.m4a
+*.wav
+*.webm
+*.opus
+audio/
+video/
+downloads/
+temp/
+tmp/
+
+# Whisper models (downloaded separately)
+models/
+*.bin
+*.pt
+
+# Ollama (managed by ollama itself)
+.ollama/
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Build
+dist/
+build/
