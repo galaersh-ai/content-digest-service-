@@ -11,7 +11,7 @@ from pathlib import Path
 import httpx
 
 # Config
-API_URL = "http://localhost:8000"  # Change to VPS IP in production
+API_URL = "http://5.129.218.58:8000"  # VPS server
 POLL_INTERVAL = 10  # seconds
 WHISPER_MODEL = "medium"
 OLLAMA_MODEL = "mistral:7b-instruct-q4_K_M"
