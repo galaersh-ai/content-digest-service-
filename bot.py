@@ -15,6 +15,13 @@ from aiogram.enums import ParseMode
 BOT_TOKEN = "8797609925:AAFnlaW2oFNhjlXwvA9d78doLuq5cmJaqLc"
 DB_PATH = Path(__file__).parent / "data" / "queue.db"
 
+# Whitelist: только эти user_id могут использовать бота
+# Узнать свой ID: напиши боту @userinfobot
+ALLOWED_USERS = [
+    198441944,  # Твой основной аккаунт (уже есть в базе)
+    # Добавь сюда другие ID
+]
+
 # Init
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
@@ -91,9 +98,23 @@ def update_task(task_id: int, status: str, result: str = None):
     conn.close()
 
 
+def is_allowed(user_id: int) -> bool:
+    """Check if user is in whitelist."""
+    return user_id in ALLOWED_USERS
+
+
+@dp.message(Command("id"))
+async def cmd_id(message: types.Message):
+    """Show user's Telegram ID."""
+    await message.answer(f"🆔 Твой Telegram ID: `{message.from_user.id}`", parse_mode=ParseMode.MARKDOWN)
+
+
 @dp.message(Command("start"))
 async def cmd_start(message: types.Message):
     """Handle /start command."""
+    if not is_allowed(message.from_user.id):
+        await message.answer("⛔ Доступ запрещён. Обратись к администратору.")
+        return
     await message.answer(
         "👋 Привет! Я делаю саммари контента.\n\n"
         "Отправь мне:\n"
@@ -142,6 +163,10 @@ async def cmd_status(message: types.Message):
 @dp.message(F.text.regexp(r'https?://'))
 async def handle_url(message: types.Message):
     """Handle URLs."""
+    if not is_allowed(message.from_user.id):
+        await message.answer("⛔ Доступ запрещён.")
+        return
+
     url = message.text.strip()
 
     # Validate URL
